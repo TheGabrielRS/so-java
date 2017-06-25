@@ -20,12 +20,9 @@ public class SO {
         new Thread(spool).start();
 
         for(int x=0; x < 5; x++){
-            new Thread(new Usuario("u"+x, spool, "u"+x, x)).start();
+            Thread t = new Thread(new Usuario("u"+x, spool, "u"+x, x));
+            t.setDaemon(false);
+            t.start();
         }
-
-
-        
-        
     }
-    
 }

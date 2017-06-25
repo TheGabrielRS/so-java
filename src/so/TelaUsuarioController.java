@@ -14,7 +14,7 @@ import javax.swing.JList;
  *
  * @author GabrielRS
  */
-public class TelaController implements Runnable{
+public class TelaUsuarioController implements Runnable{
     
     private String nome;
     private Spool spool;
@@ -22,7 +22,7 @@ public class TelaController implements Runnable{
     private String[] listaEmAndamento = null;
     private TelaUsuario tela;
 
-    public TelaController(String nome, Spool spool) {
+    public TelaUsuarioController(String nome, Spool spool) {
         this.nome = nome;
         this.spool = spool;
         this.tela = new TelaUsuario();
@@ -52,12 +52,4 @@ public class TelaController implements Runnable{
         String[] str = {this.spool.getEmAndamento()};
         tela.getAndamentoList().setListData(str);
     }
-    
-//    public void atualizaAndamentoList(){
-//        if(!Arrays.equals(this.spool.converteEmAndamento(),this.listaEmAndamento)){
-//            tela.getAndamentoList().setListData(this.spool.converteEmAndamento());
-//            this.listaEmAndamento = this.spool.converteEmAndamento();
-//        }
-//    }
-    
 }

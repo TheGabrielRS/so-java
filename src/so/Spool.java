@@ -5,14 +5,11 @@
  */
 package so;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Vector;
+import java.awt.Color;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -20,71 +17,57 @@ import java.util.logging.Logger;
  */
 public class Spool implements Runnable{
 
-    private ConcurrentLinkedQueue<String> filaVector;
-//    private Vector<String> emAndamento;
+    private ConcurrentLinkedQueue<String> fila;
     private String emAndamento = "";
-    private Thread printer;
-//    private String[] filaStr = null;
+    private Thread printerT;
     
     
     public Spool() {
-        this.filaVector = new <String>ConcurrentLinkedQueue();
-//        this.emAndamento = new Vector();
-        
-//        this.filaStr = {"vazio"};
+        this.fila = new <String>ConcurrentLinkedQueue();
     }
     
     public void run(){
         while(true){
-                if(!filaVector.isEmpty()){
+                if(!fila.isEmpty()){
                     this.imprime();
                 }
             }
         }
     
-    public boolean adicionaNaFila(String str){
-        filaVector.add(str);
-        System.out.println(filaVector.toString());
+    public boolean adicionaNaFila(String str, String usr){
+        fila.add(str);
+        new Thread(()->{
+                JOptionPane.showMessageDialog(null, "Adicionado na fila\nOrigem: "+usr+"\nPosição: "+fila.size(), usr, 1);
+            }).start();
         return true;
     }
     
-    public void removeDaFila(int pos){
+    public void removeDaFila(String str){
         try{
-            filaVector.remove(pos);
+            fila.remove(str);
         }catch(Exception e){
-            System.out.println("já foi impresso");
+            new Thread(()->{
+                JOptionPane.showMessageDialog(null, "Processo não se encontra na fila");
+            }).start();
         }
     }
     
     public void imprime(){
-        System.out.println("Antes da impressão: "+this.filaVector.toString());
-        String impresso = this.filaVector.remove();
-        emAndamento = impresso;
-//        emAndamento.add(impresso);
+        String buff = this.fila.remove();
+        emAndamento = buff;
         boolean imprimindo = true;
-        this.printer = new Thread(new Printer(impresso,imprimindo));
-        this.printer.start();
-        while(this.printer.isAlive()){
-            try {
-                Thread.sleep(1000);
-                System.out.println("imprimindo - spool");
-            } catch (InterruptedException ex) {
-                Logger.getLogger(Spool.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        Printer printer = new Printer(buff);
+        this.printerT = new Thread(printer);
+        this.printerT.start();
+        while(this.printerT.isAlive()){
         }
-        System.out.println("Após impressão: "+this.filaVector.toString());
-//        emAndamento.remove(impresso);
         emAndamento = "";
     }
 
     public String[] converteFilaVector() {
-        return this.converteVector(this.filaVector);
+        return this.converteVector(this.fila);
     }
-    
-//    public String[] converteEmAndamento(){
-//        return this.converteVector(this.emAndamento);
-//    }
-    
+
     public String getEmAndamento(){
         synchronized(this.emAndamento){
             return this.emAndamento;
@@ -104,10 +87,7 @@ public class Spool implements Runnable{
     }
     
     public void cancelaAndamento(){
-        this.printer.interrupt();
-        System.out.println("Impressão interrompida");
-        this.emAndamento = "Impressão suspensa";
+        this.printerT.interrupt();
+        this.emAndamento = "Impressão interrompida";
     }
-
-    
 }
